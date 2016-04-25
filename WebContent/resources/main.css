@@ -1,0 +1,22 @@
+#intro {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;	 
+}
+#sel {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:30%;
+    float:left;
+    padding:5px;	      
+}
+
+#fo {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+    padding:5px;	 	 
+}

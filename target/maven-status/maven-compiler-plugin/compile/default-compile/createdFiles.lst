@@ -1,0 +1,5 @@
+com/bank/model/Response.class
+com/bank/model/Criterial.class
+com/bank/dao/CloudantClientMgr.class
+com/bank/model/BankInfo.class
+com/bank/controller/CriterialController.class
