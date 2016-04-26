@@ -82,7 +82,7 @@
 			chart.render();
 		}
 	</script>
-	<div id="chartContainer" style="height: 300px; width: 70%;  float:left;"></div>
+	<div id="chartContainer" style="height: 300px; width: 80%;  float:right;"></div>
 
 	<div id="fo">Group #10</div>
 </body>

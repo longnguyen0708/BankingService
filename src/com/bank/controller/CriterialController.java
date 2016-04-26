@@ -30,7 +30,12 @@ public class CriterialController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String redirect() {
-		return "redirect:criterial";
+		return "redirect:index";
+	}
+	
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public String index() {
+		return "index";
 	}
 
 	@RequestMapping(value = "/criterial", method = RequestMethod.GET)
