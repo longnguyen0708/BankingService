@@ -10,14 +10,14 @@
 		<table>
 
 			<tr>
-				<td>Service :</td>
+				<td>Service</td>
 				<td><form:select path="service">
 						<form:option value="NONE" label="--- Select ---" />
 						<form:options items="${serviceList}" />
 					</form:select></td>
 			</tr>
 			<tr>
-				<td>State :</td>
+				<td>State</td>
 				<td><form:select path="state">
 						<form:option value="NONE" label="--- Select ---" />
 						<form:options items="${stateList}" />
