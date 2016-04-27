@@ -5,10 +5,13 @@
 <title>Retail Banking Services Recomendation</title>
 </head>
 <body>
-	<div>You must login to use our service</div>
-	<form:form action="/doLogin" method="post"
-		modelAttribute="loginAttribute">
+	<form:form action="/doSignup" method="post"
+		modelAttribute="signupAttribute">
 		<table border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<th>Your name</th>
+				<td><form:input type="text" class="login-inp" path="username" /></td>
+			</tr>
 			<tr>
 				<th>Email</th>
 				<td><form:input type="text" class="login-inp" path="email" /></td>
@@ -18,13 +21,13 @@
 				<td><form:input type="password" path="password" /></td>
 			</tr>
 			<tr>
-				<th></th>
-				<td valign="top"><input type="checkbox" class="checkbox-size"
-					id="login-check" /><label for="login-check">Remember me</label></td>
+				<th>Password again</th>
+				<td><form:input type="password" path="passwordAgain" /></td>
 			</tr>
 			<tr>
 				<th></th>
-				<td><input type="submit" class="submit-login" /></td>
+				<td><input type="submit" class="submit-login"
+					name="Create your account" /></td>
 			</tr>
 		</table>
 	</form:form>
@@ -34,7 +37,5 @@
 		<div style="color: red;">${notiMsg}</div>
 		<!--  end message-red -->
 	</c:if>
-	
-	<a href="/signup"> create your (branch name) account</a>
 </body>
 </html>

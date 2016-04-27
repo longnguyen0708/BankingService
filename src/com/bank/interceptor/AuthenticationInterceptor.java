@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.bank.model.LoginForm;
+import com.bank.model.UserInfo;
 
 @Component
 public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
@@ -20,8 +20,10 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
 		if (!request.getRequestURI().equals("/")
 				&& !request.getRequestURI().equals("/doLogin")
 				&& !request.getRequestURI().equals("/login")
+				&& !request.getRequestURI().equals("/signup")
+				&& !request.getRequestURI().equals("/doSignup")
 				&& !request.getRequestURI().equals("/index")){
-			LoginForm userData = (LoginForm) request.getSession().getAttribute(
+			UserInfo userData = (UserInfo) request.getSession().getAttribute(
 					"LOGGEDIN_USER");
 			if (userData == null) {
 				response.sendRedirect("/login");

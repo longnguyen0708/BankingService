@@ -17,11 +17,14 @@ public class CloudantClientMgr {
 
 	private static CloudantClient cloudant = null;
 	private static Database db = null;
+	private static Database userDB = null;
 	private static ViewRequestBuilder serviceStateView = null;
 
 	private static String databaseName = "consumer_complaints";
 	private static String designDoc = "service";
 	private static String view = "complaints";
+	
+	private static String userDatabaseName = "user_info";
 
 	private static String user = null;
 	private static String password = null;
@@ -106,6 +109,21 @@ public class CloudantClientMgr {
 			throw e;
 		}
 		return serviceStateView;
+	}
+	
+	public static Database getUserDB() {
+		if (cloudant == null) {
+			initClient();
+		}
+
+		if (userDB == null) {
+			try {
+				userDB = cloudant.database(userDatabaseName, true);
+			} catch (Exception e) {
+				throw new RuntimeException("userDB Not found", e);
+			}
+		}
+		return userDB;
 	}
 
 	private CloudantClientMgr() {

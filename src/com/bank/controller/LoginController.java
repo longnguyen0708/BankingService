@@ -12,53 +12,58 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.bank.model.LoginForm;
+import com.bank.dao.CloudantClientMgr;
+import com.bank.model.SignupInfo;
+import com.bank.model.UserInfo;
+import com.cloudant.client.org.lightcouch.NoDocumentException;
 
 @Controller
 public class LoginController {
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String showLogin(Model model) {
-		LoginForm loginForm = new LoginForm();
-		model.addAttribute("loginAttribute", loginForm);
-		boolean error = false;
-		String msg = "";
-		model.addAttribute("error", error);
-		model.addAttribute("errorMsg", msg);
+		UserInfo loginForm = new UserInfo();
+		PackModel(model, false, "", loginForm);
 		return "login";
 	}
 
 	@RequestMapping(value = "/doLogin", method = RequestMethod.POST)
-	public String login(@ModelAttribute("SpringWeb") LoginForm loginform,
+	public String login(@ModelAttribute("SpringWeb") UserInfo loginform,
 			Model model, HttpServletRequest request) throws Exception {
 
-		String username = loginform.getUsername();
+		String email = loginform.getEmail();
 		String password = loginform.getPassword();
-
+		System.out.println("login infor: email=" + email + ", password=" + password);
 		// A simple authentication manager
-		if (username != null && password != null) {
-
-			if (username.equals("long")
-					&& password.equals("79")) {
-				// Set a session attribute to check authentication then redirect
-				// to the welcome uri;
-				request.getSession().setAttribute("LOGGEDIN_USER", loginform);
-				return "redirect:criterial";
-			} else {
-				boolean error = true;
-				String msg = "Wrong User name or Password";
-				model.addAttribute("error", error);
-				model.addAttribute("errorMsg", msg);
-				model.addAttribute("loginAttribute", loginform);
+		if (email != null && password != null) {
+			try {
+				UserInfo userInfo = CloudantClientMgr.getUserDB().find(
+						UserInfo.class, email);
+				System.out.println("Login: fetched userInfo " + userInfo.toString());
+				if (userInfo.getPassword().equals(password)) {
+					request.getSession()
+							.setAttribute("LOGGEDIN_USER", userInfo);
+					return "redirect:criterial";
+				} else {
+					PackModel(model, true, "Email or Password was incorrect",
+							loginform);
+					return "login";
+				}
+			} catch (NoDocumentException e) {
+				PackModel(model, true, "Email or Password was incorrect",
+						loginform);
 				return "login";
 			}
 		} else {
-			boolean error = true;
-			String msg = "Empty User name or Password";
-			model.addAttribute("error", error);
-			model.addAttribute("errorMsg", msg);
-			model.addAttribute("loginAttribute", loginform);
+			PackModel(model, true, "Email or Password was incorrect", loginform);
 			return "login";
 		}
+	}
+
+	private void PackModel(Model model, boolean noti, String notiMsg,
+			UserInfo loginform) {
+		model.addAttribute("noti", noti);
+		model.addAttribute("notiMsg", notiMsg);
+		model.addAttribute("loginAttribute", loginform);
 	}
 }
