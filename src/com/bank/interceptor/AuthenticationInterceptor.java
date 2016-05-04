@@ -26,7 +26,8 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
 			UserInfo userData = (UserInfo) request.getSession().getAttribute(
 					"LOGGEDIN_USER");
 			if (userData == null) {
-				response.sendRedirect("/login");
+				request.getSession().setAttribute("FORCE_LOGIN", "YES");
+				response.sendRedirect("/index");
 				return false;
 			}
 		}

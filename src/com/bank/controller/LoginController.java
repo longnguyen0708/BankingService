@@ -33,30 +33,34 @@ public class LoginController {
 
 		String email = loginform.getEmail();
 		String password = loginform.getPassword();
-		System.out.println("login infor: email=" + email + ", password=" + password);
+		System.out.println("login infor: email=" + email + ", password="
+				+ password);
 		// A simple authentication manager
-		if (email != null && password != null) {
+		if (email != null && !email.equals("")) {
 			try {
 				UserInfo userInfo = CloudantClientMgr.getUserDB().find(
 						UserInfo.class, email);
-				System.out.println("Login: fetched userInfo " + userInfo.toString());
+				System.out.println("Login: fetched userInfo "
+						+ userInfo.toString());
 				if (userInfo.getPassword().equals(password)) {
 					request.getSession()
 							.setAttribute("LOGGEDIN_USER", userInfo);
-					return "redirect:criterial";
+					request.getSession().removeAttribute("FORCE_LOGIN");
+					PackModel(model, false, "", loginform);
+					return "index";
 				} else {
 					PackModel(model, true, "Email or Password was incorrect",
 							loginform);
-					return "login";
+					return "index";
 				}
 			} catch (NoDocumentException e) {
 				PackModel(model, true, "Email or Password was incorrect",
 						loginform);
-				return "login";
+				return "index";
 			}
 		} else {
 			PackModel(model, true, "Email or Password was incorrect", loginform);
-			return "login";
+			return "index";
 		}
 	}
 

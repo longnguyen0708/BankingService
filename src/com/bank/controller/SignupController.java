@@ -65,7 +65,9 @@ public class SignupController {
 
 						request.getSession().setAttribute("LOGGEDIN_USER",
 								newUser);
-						return "redirect:criterial";
+						request.getSession().removeAttribute("FORCE_LOGIN");
+						PackLoginModel(model, false, "", newUser);
+						return "index";
 					} else {
 						PackModel(model, true, "Password does not match",
 								signupform);
@@ -92,5 +94,12 @@ public class SignupController {
 		model.addAttribute("noti", noti);
 		model.addAttribute("notiMsg", notiMsg);
 		model.addAttribute("signupAttribute", signupform);
+	}
+	
+	private void PackLoginModel(Model model, boolean noti, String notiMsg,
+			UserInfo loginform) {
+		model.addAttribute("noti", noti);
+		model.addAttribute("notiMsg", notiMsg);
+		model.addAttribute("loginAttribute", loginform);
 	}
 }

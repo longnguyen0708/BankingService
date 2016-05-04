@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -32,9 +34,17 @@ public class CriterialController {
 	public String redirect() {
 		return "redirect:index";
 	}
-	
+
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
-	public String index() {
+	public String index(Model model, HttpServletRequest request) {
+		UserInfo loginForm = new UserInfo();
+		if (request.getSession().getAttribute("FORCE_LOGIN") == null) {
+			PackLoginModel(model, false, "", loginForm);
+		} else {
+			PackLoginModel(model, true, "Please login to use our service.",
+					loginForm);
+		}
+
 		return "index";
 	}
 
@@ -159,6 +169,13 @@ public class CriterialController {
 
 	private ViewRequestBuilder getViewBuilder() {
 		return CloudantClientMgr.getServiceStateView();
+	}
+
+	private void PackLoginModel(Model model, boolean noti, String notiMsg,
+			UserInfo loginform) {
+		model.addAttribute("noti", noti);
+		model.addAttribute("notiMsg", notiMsg);
+		model.addAttribute("loginAttribute", loginform);
 	}
 
 }
