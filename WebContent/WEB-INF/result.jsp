@@ -82,7 +82,16 @@
 			chart.render();
 		}
 	</script>
-	<div id="chartContainer" style="height: 300px; width: 80%;  float:right;"></div>
+	<c:choose>
+		<c:when test="${res.bankList.size() > 0}">
+			<div id="chartContainer"
+				style="height: 300px; width: 80%; float: right;"></div>
+		</c:when>
+		<c:otherwise>
+			<div>choose searching cirterial on the left</div>
+		</c:otherwise>
+	</c:choose>
+
 
 	<div id="fo">Group #10</div>
 </body>

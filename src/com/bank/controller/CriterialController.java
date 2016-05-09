@@ -106,6 +106,18 @@ public class CriterialController {
 
 		model.addAttribute("stateList", stateList);
 	}
+	
+	@RequestMapping(value = "/result", method = RequestMethod.GET)
+	public String viewResult(Model model) {
+		System.out.println("in viewResult");
+		Response res = new Response();
+
+		model.addAttribute("res", res);
+		init(model);
+		model.addAttribute("criterialForm", new Criterial());
+		return "result";
+	}
+
 
 	@RequestMapping(value = "/addCriterial", method = RequestMethod.POST)
 	public String addCriterial(
@@ -116,6 +128,13 @@ public class CriterialController {
 
 		// assign criterial to response
 		res.setCriterial(criterial);
+		
+		if (criterial.getService().equals("NONE") || criterial.getState().equals("NONE")) {
+			model.addAttribute("res", res);
+			init(model);
+			model.addAttribute("criterialForm", criterial);
+			return "result";
+		}
 
 		// assign Bank info
 		List<BankInfo> bankInfoList = res.getBankList();

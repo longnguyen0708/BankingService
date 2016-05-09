@@ -157,7 +157,7 @@
 
 	<div class="container">
 		<div class="jumbotron">
-			<a href="/criterial">
+			<a href="/result">
 				<h2 class="text-primary">Retail Banking Recommendation System</h2>
 				<p class="text-muted">Let's select a bank in your area!</p>
 			</a>
