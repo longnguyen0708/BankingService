@@ -34,13 +34,19 @@ div#sel {
 }
 </style>
 <script async defer
-	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpN0ue_rAXowatn9dDGeGh0_DWVfUZD2Y&callback=initMap">
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpN0ue_rAXowatn9dDGeGh0_DWVfUZD2Y&callback=initMap&libraries=places">
 	
 </script>
 
 <script type="text/javascript">
+	var marker = null;
+	var infowindowtarget;
+	var placeservice;
+	var markers = [];
+	var map;
+
 	function initMap() {
-		var map = new google.maps.Map(document.getElementById('map'), {
+		map = new google.maps.Map(document.getElementById('map'), {
 			zoom : 11,
 			center : {
 				lat : 37.333,
@@ -49,14 +55,16 @@ div#sel {
 		});
 		var geocoder = new google.maps.Geocoder;
 		var infowindow = new google.maps.InfoWindow;
+		infowindowtarget = new google.maps.InfoWindow();
+		placeservice = new google.maps.places.PlacesService(map);
 
 		map.addListener('click', function(e) {
-			geocodeLatLng(e.latLng, geocoder, map, infowindow);
+			geocodeLatLng(e.latLng, geocoder, infowindow);
 		});
 
 	}
 
-	function geocodeLatLng(rawLatLng, geocoder, map, infowindow) {
+	function geocodeLatLng(rawLatLng, geocoder, infowindow) {
 
 		var latlngStr = rawLatLng.toString().split(',');
 
@@ -99,15 +107,37 @@ div#sel {
 									if (country.localeCompare("US") == 0) {
 
 										sendCriterial(state, postal_code);
-
-										var marker = new google.maps.Marker({
+										if (marker != null) {
+											marker.setMap(null);
+										}
+										marker = new google.maps.Marker({
 											position : latlng,
 											map : map
 										});
+
 										infowindow
 												.setContent(results[0].formatted_address);
 										infowindow.open(map, marker);
 
+										//clear target markers
+										for (var i = 0; i < markers.length; i++) {
+											markers[i].setMap(null);
+										}
+										markers = [];
+										//search bank nearby
+										marker
+												.addListener(
+														'click',
+														function() {
+															placeservice
+																	.nearbySearch(
+																			{
+																				location : latlng,
+																				name : "Wells Fargo",
+																				rankBy : google.maps.places.RankBy.DISTANCE
+																			},
+																			nearbycallback);
+														});
 									} else {
 										window
 												.alert('Sorry, We only provide service in US!!!');
@@ -120,6 +150,32 @@ div#sel {
 										+ status);
 							}
 						});
+	}
+
+	function nearbycallback(results, status) {
+		if (status === google.maps.places.PlacesServiceStatus.OK) {
+			var max = results.length;
+			if (max > 3) {
+				max = 3;
+			}
+			for (var i = 0; i < max; i++) {
+				createMarker(results[i]);
+			}
+		}
+	}
+
+	function createMarker(place) {
+		var bankmarker = new google.maps.Marker({
+			map : map,
+			position : place.geometry.location
+		});
+
+		markers.push(bankmarker);
+
+		google.maps.event.addListener(bankmarker, 'click', function() {
+			infowindowtarget.setContent(place.name);
+			infowindowtarget.open(map, this);
+		});
 	}
 
 	function sendCriterial(state, postal_code) {
