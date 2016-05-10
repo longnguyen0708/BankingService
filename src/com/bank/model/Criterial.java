@@ -5,6 +5,15 @@ import java.util.List;
 public class Criterial {
 	private String service;
 	private String state;
+	private String postalCode;
+
+	public String getPostalCode() {
+		return postalCode;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
 
 	public String getService() {
 		return service;

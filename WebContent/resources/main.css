@@ -7,14 +7,9 @@
 #sel {
     line-height:30px;
     background-color:#eeeeee;
-    height:500px;
-    width:210px;
-    float:left;
     padding:5px;
-}
-
-#criterialForm {
-        width: 200px;
+    text-align:center;
+    width: 1265px;
 }
 
 #fo {
@@ -22,5 +17,34 @@
     color:white;
     clear:both;
     text-align:center;
-    padding:5px;	 	 
+    padding:5px;	
+    width: 1265px; 	 
+}
+
+#floating-panel {
+  position: absolute;
+  top: 10px;
+  left: 25%;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+  text-align: center;
+  font-family: 'Roboto','sans-serif';
+  line-height: 30px;
+  padding-left: 10px;
+}
+#floating-panel {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  margin-left: -180px;
+  width: 350px;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+}
+#latlng {
+  width: 225px;
 }

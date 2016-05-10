@@ -6,10 +6,12 @@ import java.util.List;
 public class Response {
 	private Criterial criterial;
 	private List<BankInfo> bankList;
+	private List<Sentiment> sentimentList;
 	
 	public Response() {
 		super();
 		bankList = new ArrayList<BankInfo>();
+		sentimentList = new ArrayList<Sentiment>();
 	}
 	public Criterial getCriterial() {
 		return criterial;
@@ -22,6 +24,12 @@ public class Response {
 	}
 	public void setBankList(List<BankInfo> bankList) {
 		this.bankList = bankList;
+	}
+	public List<Sentiment> getSentimentList() {
+		return sentimentList;
+	}
+	public void setSentimentList(List<Sentiment> sentimentList) {
+		this.sentimentList = sentimentList;
 	}
 	
 }

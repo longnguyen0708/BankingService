@@ -22,9 +22,15 @@ public class CloudantClientMgr {
 
 	private static String databaseName = "consumer_complaints";
 	private static String designDoc = "service";
-	private static String view = "complaints";
+	private static String view = "zipcode";
 	
 	private static String userDatabaseName = "user_info";
+	
+	private static Database twitterDB = null;
+	private static ViewRequestBuilder twitterViewRequestBuilder = null;
+	private static String twitterDatabaseName = "twitter_feed";
+	private static String designTwitterDoc = "twitter_design";
+	private static String twitterView = "twitter_view";
 
 	private static String user = null;
 	private static String password = null;
@@ -124,6 +130,30 @@ public class CloudantClientMgr {
 			}
 		}
 		return userDB;
+	}
+	
+	public static Database getTwitterDB() {
+		if (cloudant == null) {
+			initClient();
+		}
+
+		if (twitterDB == null) {
+			try {
+				twitterDB = cloudant.database(twitterDatabaseName, true);
+			} catch (Exception e) {
+				throw new RuntimeException("DB Not found", e);
+			}
+		}
+		return twitterDB;
+	}
+
+	public static ViewRequestBuilder getTwitterView() {
+		try {
+			twitterViewRequestBuilder = getTwitterDB().getViewRequestBuilder(designTwitterDoc, twitterView);
+		} catch (Exception e) {
+			throw e;
+		}
+		return twitterViewRequestBuilder;
 	}
 
 	private CloudantClientMgr() {

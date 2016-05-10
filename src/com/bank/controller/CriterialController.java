@@ -6,10 +6,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -106,7 +108,7 @@ public class CriterialController {
 
 		model.addAttribute("stateList", stateList);
 	}
-	
+
 	@RequestMapping(value = "/result", method = RequestMethod.GET)
 	public String viewResult(Model model) {
 		System.out.println("in viewResult");
@@ -118,7 +120,6 @@ public class CriterialController {
 		return "result";
 	}
 
-
 	@RequestMapping(value = "/addCriterial", method = RequestMethod.POST)
 	public String addCriterial(
 			@ModelAttribute("SpringWeb") Criterial criterial, Model model) {
@@ -128,8 +129,9 @@ public class CriterialController {
 
 		// assign criterial to response
 		res.setCriterial(criterial);
-		
-		if (criterial.getService().equals("NONE") || criterial.getState().equals("NONE")) {
+
+		if (criterial.getService().equals("NONE")
+				|| criterial.getState().equals("NONE")) {
 			model.addAttribute("res", res);
 			init(model);
 			model.addAttribute("criterialForm", criterial);
@@ -180,6 +182,135 @@ public class CriterialController {
 		init(model);
 		model.addAttribute("criterialForm", criterial);
 		return "result";
+	}
+
+	@RequestMapping(value = "/sendCriterial", method = RequestMethod.POST)
+	public String sendCriterial(@RequestBody String reqData, Model model) {
+		System.out.println("sendCriterial: " + reqData);
+		JSONObject jsonObject = new JSONObject(reqData);
+		String service = jsonObject.getString("service");
+		String state = jsonObject.getString("state");
+		String postal_code = jsonObject.getString("postal_code");
+		postal_code = postal_code.substring(0, 2) + "xxx";
+
+		Response res = new Response();
+
+		// assign Bank info
+		List<BankInfo> bankInfoList = res.getBankList();
+
+		ViewRequestBuilder view = null;
+		try {
+			view = getViewBuilder();
+		} catch (Exception e) {
+			e.printStackTrace();
+			// say st to client
+		}
+		for (int i = 0; i < banks.length; i++) {
+			BankInfo bankInfo = new BankInfo();
+			bankInfo.setName(banks[i]);
+
+			Key.ComplexKey keys = Key.complex(bankInfo.getName()).add(service)
+					.add(state).add(postal_code);
+			ViewRequest<ComplexKey, Integer> request = view
+					.newRequest(Key.Type.COMPLEX, Integer.class).group(true)
+					.keys(keys).build();
+			// perform the request and get the response
+			ViewResponse<ComplexKey, Integer> response;
+			try {
+				response = request.getResponse();
+				// loop through the rows of the response
+				for (Row<ComplexKey, Integer> row : response.getRows()) {
+					ComplexKey key = row.getKey();
+					Integer value = row.getValue();
+					System.out.println("Key: " + key.toString());
+					System.out.println("Value: " + value);
+
+					bankInfo.setComplaints(value);
+				}
+
+				bankInfoList.add(bankInfo);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		// assign Sentiment info
+		List<Sentiment> sentimentInfoList = res.getSentimentList();
+
+		ViewRequestBuilder sentimentView = null;
+		try {
+			sentimentView = CloudantClientMgr.getTwitterView();
+		} catch (Exception e) {
+			e.printStackTrace();
+			// say st to client
+		}
+		for (int i = 0; i < banks.length; i++) {
+			Sentiment sentiment = new Sentiment();
+			sentiment.setBankName(banks[i]);
+			System.out.println("bank: " + banks[i]);
+			Key.ComplexKey keys = Key.complex(sentiment.getBankName()).add("positive");
+			
+			ViewRequest<ComplexKey, Integer> request = sentimentView
+					.newRequest(Key.Type.COMPLEX, Integer.class).group(true)
+					.keys(keys).build();
+
+			// perform the request and get the response
+			ViewResponse<ComplexKey, Integer> response;
+			try {
+				response = request.getResponse();
+		
+				// loop through the rows of the response
+				for (Row<ComplexKey, Integer> row : response.getRows()) {
+					ComplexKey key = row.getKey();
+					Integer value = row.getValue();
+					System.out.println("Key: " + key.toString());
+					System.out.println("Value: " + value);
+
+					sentiment.setPositive(value);
+				}
+
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			keys = Key.complex(sentiment.getBankName()).add("negative");
+			
+			request = sentimentView
+					.newRequest(Key.Type.COMPLEX, Integer.class).group(true)
+					.keys(keys).build();
+			// perform the request and get the response
+			try {
+				response = request.getResponse();
+				// loop through the rows of the response
+				for (Row<ComplexKey, Integer> row : response.getRows()) {
+					ComplexKey key = row.getKey();
+					Integer value = row.getValue();
+					System.out.println("Key: " + key.toString());
+					System.out.println("Value: " + value);
+
+					sentiment.setNegative(value);
+				}
+
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			sentimentInfoList.add(sentiment);
+		}
+
+		Criterial criterial = new Criterial();
+		criterial.setService(service);
+		criterial.setState(state);
+		criterial.setPostalCode(postal_code);
+		res.setCriterial(criterial);
+		model.addAttribute("res", res);
+
+		return "graphcontent";
 	}
 
 	private Database getDB() {
