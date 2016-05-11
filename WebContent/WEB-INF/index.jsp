@@ -4,7 +4,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Retail Banking Services Recomendation</title>
+<title>Retail Banking Services Recommendation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
 
 <script type="text/javascript"
 	src="<c:url value="/resources/jquery-1.12.3.min.js" />"></script>
@@ -12,7 +17,9 @@
 	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <script
 	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="<c:url value="/resources/style.css" />">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link href="<c:url value="/resources/main.css"/>" rel="stylesheet">
 <style>
 .carousel-inner>.item>img, .carousel-inner>.item>a>img {
 	width: 100%;
@@ -21,25 +28,40 @@
 </style>
 </head>
 <body>
-	<%
-		UserInfo userData = (UserInfo) request.getSession().getAttribute(
-				"LOGGEDIN_USER");
-		if (userData == null) {
-	%>
-	<div class="container" style="float: right;">
-		<input type="button" value="Sign in" data-toggle="modal"
-			data-target="#myModalin">
-	</div>
-	<%
-		} else {
-	%>
-	<div style="float: right;">
-		Hello, <%=userData.getUsername()%>
+
+	<div id="intro">
+		<div class="row">
+			<div class="col-sm-10">
+				<p class="description"></p>
+			</div>
+			<div class="col-sm-2" style="float: right;">
+				<%
+					UserInfo userData = (UserInfo) request.getSession().getAttribute(
+							"LOGGEDIN_USER");
+					if (userData == null) {
+				%>
+
+				<input type="button" value="Sign in" data-toggle="modal"
+					data-target="#myModalin">
+
+				<%
+					} else {
+				%>
+				<div style="float: right;">
+					Hello,
+					<%=userData.getUsername()%>
+				</div>
+
+				<%
+					}
+				%>
+			</div>
+		</div>
+		<h1>Retail Banking Services Recommendation</h1>
+
 	</div>
 
-	<%
-		}
-	%>
+
 
 	<script type="text/javascript">
 		<c:if test="${noti}">
@@ -73,7 +95,7 @@
 											type="password" path="password" />
 										<br>
 										<input type="submit" class="btn btn-info btn-block login"
-											name="login" id="login" value="login" />
+											name="login" id="login_1" value="login" />
 										<br>
 									</form:form>
 									<a href="/signup"> Create your account</a>
@@ -98,14 +120,7 @@
 	</div>
 	<!-- /.modal -->
 
-	<div class="container">
-		<ul class="pagination">
-			<li><a href="details.html">About Us</a></li>
-			<li><a href="real-time.html">Special Feature</a></li>
-			<li><a href="forms.html">Service</a></li>
-			<li><a href="contact.html">Contact Us</a></li>
-		</ul>
-	</div>
+	<br>
 
 
 	<div class="container">
@@ -116,30 +131,26 @@
 				<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
 				<li data-target="#myCarousel" data-slide-to="1"></li>
 				<li data-target="#myCarousel" data-slide-to="2"></li>
-				<li data-target="#myCarousel" data-slide-to="3"></li>
+				<br>
 			</ol>
 
 			<!-- Wrapper for slides -->
 			<div class="carousel-inner" role="listbox">
 				<div class="item active">
-					<img src="/resources/images/bank1.png" alt="Bank1" width="460"
+					<img src="/resources/images/Pic1.png" alt="Bank1" width="460"
 						height="100">
 				</div>
 
 				<div class="item">
-					<img src="/resources/images/bank2.png" alt="Bank2" width="460"
+					<img src="/resources/images/Pic2.png" alt="Bank2" width="460"
 						height="100">
 				</div>
 
 				<div class="item">
-					<img src="/resources/images/bank3.png" alt="Bank3" width="460"
+					<img src="/resources/images/Pic3.png" alt="Bank3" width="460"
 						height="100">
 				</div>
 
-				<div class="item">
-					<img src="/resources/images/bank4.png" alt="Bank4" width="460"
-						height="345">
-				</div>
 			</div>
 
 			<!-- Left and right controls -->
@@ -155,38 +166,24 @@
 		</div>
 	</div>
 
+
 	<div class="container">
-		<div class="jumbotron">
-			<a href="/result">
-				<h2 class="text-primary">Retail Banking Recommendation System</h2>
-				<p class="text-muted">Let's select a bank in your area!</p>
-			</a>
-		</div>
 		<div class="row">
-			<div class="col-sm-4">
-				<h3 class="text-info">
-					<a href="details.html"> Click to see Details About APP 
+			<div class="col-sm-5"></div>
+			<div class="col-sm-7">
+				<h3 class="text-primary">
+					Start here <a href="/result" class="btn btn-info btn-md"> <span
+						class="glyphicon glyphicon-play-circle"></span>
+					</a>
 				</h3>
-				</a>
-				<p class="text-muted">Provides results based on your selection
-					criteria</p>
-			</div>
-			<div class="col-sm-4">
-				<h3 class="text-info">
-					<a href="real-time.html"> Real-time reviews 
-				</h3>
-				</a>
-				<p class="text-muted">Shows latest feedbacks</p>
-			</div>
-			<div class="col-sm-4">
-				<h3 class="text-info">
-					<a href="contact.html"> Contact us 
-				</h3>
-				</a>
-				<p class="text-muted">Open for further details and enquiry</p>
+				<br> <br> <br>
+
 			</div>
 		</div>
 	</div>
+
+
+	<div id="fo">Group #10</div>
 
 </body>
 </html>

@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Retail Banking Services Recomendation</title>
+<title>Retail Banking Services Recommendation</title>
 <script type="text/javascript"
 	src="<c:url value="/resources/jscharts.js" />">
 	
@@ -34,7 +34,7 @@ div#sel {
 }
 </style>
 <script async defer
-	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpN0ue_rAXowatn9dDGeGh0_DWVfUZD2Y&callback=window.initMap&libraries=places">
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpN0ue_rAXowatn9dDGeGh0_DWVfUZD2Y&callback=initMap&libraries=places">
 	
 </script>
 
@@ -54,7 +54,7 @@ div#sel {
 	var address;
 	var isdisplayautolocation = false;
 
-	window.initMap = function() {
+	function initMap() {
 		map = new google.maps.Map(document.getElementById('map'), {
 			zoom : 12,
 			center : {
@@ -167,6 +167,15 @@ div#sel {
 			infowindow.setContent(address + "<br>Our Recommendation: <b>"
 					+ $('#recommendedbank').val().toString()
 					+ "</b><br>Click on the marker to see the nearest banks.");
+			//search bank nearby
+			marker.addListener('click', function() {
+				infowindow.close();
+				placeservice.nearbySearch({
+					location : latlng,
+					name : $('#recommendedbank').val(),
+					rankBy : google.maps.places.RankBy.DISTANCE
+				}, nearbycallback);
+			});
 		}
 		infowindow.open(map, marker);
 
@@ -175,15 +184,7 @@ div#sel {
 			markers[i].setMap(null);
 		}
 		markers = [];
-		//search bank nearby
-		marker.addListener('click', function() {
-			infowindow.close();
-			placeservice.nearbySearch({
-				location : latlng,
-				name : $('#recommendedbank').val(),
-				rankBy : google.maps.places.RankBy.DISTANCE
-			}, nearbycallback);
-		});
+
 	}
 
 	function nearbycallback(results, status) {
@@ -273,8 +274,8 @@ div#sel {
 		if (service_type.localeCompare("NONE") == 0) {
 			alert("PLEASE CHOOSE A BANK SERVICE!!!");
 		} else {
-			if (country.localeCompare("US") != 0 || state == null
-					|| postal_code == null) {
+			if (country == null || country.localeCompare("US") != 0
+					|| state == null || postal_code == null) {
 				alert("Please choose your location in US!!!");
 			} else {
 
@@ -304,7 +305,7 @@ div#sel {
 </head>
 <body>
 	<div id="intro">
-		<h1>Retail Banking Services Recomendation</h1>
+		<h1>Retail Banking Services Recommendation</h1>
 	</div>
 	<div id="sel">
 		<h3>Please choose a bank service</h3>
