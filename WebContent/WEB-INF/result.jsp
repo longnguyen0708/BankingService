@@ -34,7 +34,7 @@ div#sel {
 }
 </style>
 <script async defer
-	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpN0ue_rAXowatn9dDGeGh0_DWVfUZD2Y&callback=initMap&libraries=places">
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpN0ue_rAXowatn9dDGeGh0_DWVfUZD2Y&callback=window.initMap&libraries=places">
 	
 </script>
 
@@ -46,10 +46,17 @@ div#sel {
 	var map;
 	var directionsDisplay = null;
 	var directionsService;
+	var state = null;
+	var country = null;
+	var postal_code = null;
+	var latlng;
+	var infowindow;
+	var address;
+	var isdisplayautolocation = false;
 
-	function initMap() {
+	window.initMap = function() {
 		map = new google.maps.Map(document.getElementById('map'), {
-			zoom : 11,
+			zoom : 12,
 			center : {
 				lat : 37.333,
 				lng : -121.881
@@ -57,21 +64,29 @@ div#sel {
 		});
 		directionsService = new google.maps.DirectionsService;
 		var geocoder = new google.maps.Geocoder;
-		var infowindow = new google.maps.InfoWindow;
+		infowindow = new google.maps.InfoWindow;
 		infowindowtarget = new google.maps.InfoWindow();
 		placeservice = new google.maps.places.PlacesService(map);
 
 		map.addListener('click', function(e) {
-			if (directionsDisplay != null) {
-				directionsDisplay.setMap(null);
-				directionsDisplay = null;
-			}
-			geocodeLatLng(e.latLng, geocoder, infowindow);
+			geocodeLatLng(e.latLng, geocoder, true);
 		});
-
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				isdisplayautolocation = true;
+				var rawLatLng = "(" + position.coords.latitude + ","
+						+ position.coords.longitude + ")";
+				geocodeLatLng(rawLatLng, geocoder, false);
+			}, function() {
+				//handleLocationError(true, infoWindow, map.getCenter());
+			});
+		} else {
+			// Browser doesn't support Geolocation
+			//handleLocationError(false, infoWindow, map.getCenter());
+		}
 	}
 
-	function geocodeLatLng(rawLatLng, geocoder, infowindow) {
+	function geocodeLatLng(rawLatLng, geocoder, issendreq) {
 
 		var latlngStr = rawLatLng.toString().split(',');
 
@@ -79,7 +94,7 @@ div#sel {
 		var longt = parseFloat(latlngStr[1].substring(0,
 				latlngStr[1].length - 1));
 
-		var latlng = {
+		latlng = {
 			lat : lati,
 			lng : longt
 		};
@@ -92,9 +107,6 @@ div#sel {
 							if (status === google.maps.GeocoderStatus.OK) {
 								if (results[0]) {
 
-									var state;
-									var country;
-									var postal_code;
 									for (var i = 0; i < results[0].address_components.length; i++) {
 										if (results[0].address_components[i].types[0]
 												.localeCompare("administrative_area_level_1") == 0) {
@@ -111,46 +123,19 @@ div#sel {
 										}
 
 									}
-									if (country.localeCompare("US") == 0) {
 
-										sendCriterial(state, postal_code);
-										if (marker != null) {
-											marker.setMap(null);
+									address = results[0].formatted_address;
+									if (issendreq == true) {
+										if (country.localeCompare("US") == 0) {
+
+											sendCriterial(handleusermaker);
+
+										} else {
+											window
+													.alert('Sorry, We only provide service in US!!!');
 										}
-										marker = new google.maps.Marker({
-											position : latlng,
-											icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-											map : map
-										});
-
-										infowindow
-												.setContent(results[0].formatted_address
-														+ "<br>Our Recommendation: <b>Wells Fargo</b><br>Click on the marker to see the nearest bank.");
-										infowindow.open(map, marker);
-
-										//clear target markers
-										for (var i = 0; i < markers.length; i++) {
-											markers[i].setMap(null);
-										}
-										markers = [];
-										//search bank nearby
-										marker
-												.addListener(
-														'click',
-														function() {
-															infowindow.close();
-															placeservice
-																	.nearbySearch(
-																			{
-																				location : latlng,
-																				name : "Wells Fargo",
-																				rankBy : google.maps.places.RankBy.DISTANCE
-																			},
-																			nearbycallback);
-														});
 									} else {
-										window
-												.alert('Sorry, We only provide service in US!!!');
+										handleusermaker();
 									}
 								} else {
 									window.alert('No results found');
@@ -160,6 +145,45 @@ div#sel {
 										+ status);
 							}
 						});
+	}
+
+	function handleusermaker() {
+		if (directionsDisplay != null) {
+			directionsDisplay.setMap(null);
+			directionsDisplay = null;
+		}
+		if (marker != null) {
+			marker.setMap(null);
+		}
+		marker = new google.maps.Marker({
+			position : latlng,
+			icon : 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+			map : map
+		});
+		if (isdisplayautolocation == true) {
+			infowindow.setContent(address);
+			isdisplayautolocation = false;
+		} else {
+			infowindow.setContent(address + "<br>Our Recommendation: <b>"
+					+ $('#recommendedbank').val().toString()
+					+ "</b><br>Click on the marker to see the nearest banks.");
+		}
+		infowindow.open(map, marker);
+
+		//clear target markers
+		for (var i = 0; i < markers.length; i++) {
+			markers[i].setMap(null);
+		}
+		markers = [];
+		//search bank nearby
+		marker.addListener('click', function() {
+			infowindow.close();
+			placeservice.nearbySearch({
+				location : latlng,
+				name : $('#recommendedbank').val(),
+				rankBy : google.maps.places.RankBy.DISTANCE
+			}, nearbycallback);
+		});
 	}
 
 	function nearbycallback(results, status) {
@@ -218,7 +242,7 @@ div#sel {
 		});
 	}
 
-	function sendCriterial(state, postal_code) {
+	function sendCriterial(callback) {
 		var service_type = $("#service_input").val();
 		if (service_type.localeCompare("NONE") == 0) {
 			alert("PLEASE CHOOSE A BANK SERVICE!!!");
@@ -233,6 +257,7 @@ div#sel {
 				success : function(data) {
 					$(document).ready(function() {
 						$("#graph_content").html(data);
+						callback();
 					});
 				},
 				error : function(data, status, er) {
@@ -240,6 +265,38 @@ div#sel {
 
 				}
 			});
+		}
+	}
+
+	function sendcriterialfromselect(selec, callback) {
+		var service_type = selec.value;
+		if (service_type.localeCompare("NONE") == 0) {
+			alert("PLEASE CHOOSE A BANK SERVICE!!!");
+		} else {
+			if (country.localeCompare("US") != 0 || state == null
+					|| postal_code == null) {
+				alert("Please choose your location in US!!!");
+			} else {
+
+				$.ajax({
+					url : "/sendCriterial",
+					type : 'POST',
+					contentType : 'application/json',
+					data : "{\"service\": \"" + service_type + "\""
+							+ ",\"state\": \"" + state + "\""
+							+ ",\"postal_code\": \"" + postal_code + "\"}",
+					success : function(data) {
+						$(document).ready(function() {
+							$("#graph_content").html(data);
+							callback();
+						});
+					},
+					error : function(data, status, er) {
+						alert("er:" + er);
+
+					}
+				});
+			}
 		}
 	}
 </script>
@@ -251,7 +308,8 @@ div#sel {
 	</div>
 	<div id="sel">
 		<h3>Please choose a bank service</h3>
-		<select id="service_input">
+		<select id="service_input"
+			onchange="sendcriterialfromselect(this, handleusermaker)">
 			<option value="NONE">--- Select ---</option>
 			<option value="Debt collection">Debt collection</option>
 			<option value="Credit reporting">Credit reporting</option>

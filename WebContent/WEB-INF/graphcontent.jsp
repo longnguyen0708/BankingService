@@ -103,3 +103,4 @@
 	<c:otherwise>
 	</c:otherwise>
 </c:choose>
+ <input type="hidden" id="recommendedbank" value="${bank}">

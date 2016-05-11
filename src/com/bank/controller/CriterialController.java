@@ -31,6 +31,10 @@ public class CriterialController {
 	private final String[] banks = { "Bank of America",
 			"Wells Fargo & Company", "JPMorgan Chase & Co.", "Citibank",
 			"U.S. Bancorp" };
+	
+	private final String[] displayBanks = { "Bank of America",
+			"Wells Fargo", "JPMorgan Chase", "Citibank",
+			"U.S. Bancorp" };
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String redirect() {
@@ -309,8 +313,36 @@ public class CriterialController {
 		criterial.setPostalCode(postal_code);
 		res.setCriterial(criterial);
 		model.addAttribute("res", res);
-
+		model.addAttribute("bank", RecommendedBank(bankInfoList, sentimentInfoList));
 		return "graphcontent";
+	}
+
+	private String RecommendedBank(List<BankInfo> bankInfoList,
+			List<Sentiment> sentimentInfoList) {
+		// TODO Auto-generated method stub
+		int index = 0;
+		double val = -10000;
+		
+		int totalComplaints = 0;
+		for (int i = 0; i < bankInfoList.size();i++) {
+			totalComplaints += bankInfoList.get(i).getComplaints();
+		}
+		
+		for (int i = 0; i < bankInfoList.size(); i++) {
+			double complaint = 3 * ((double) bankInfoList.get(i).getComplaints()) *100 / totalComplaints;
+			double positivePercent = ((double) sentimentInfoList.get(i).getPositive()) *100 / (sentimentInfoList.get(i).getPositive() + sentimentInfoList.get(i).getNegative());
+			double negativePercent = ((double) sentimentInfoList.get(i).getNegative()) *100 / (sentimentInfoList.get(i).getPositive() + sentimentInfoList.get(i).getNegative());
+			double diffPercent = positivePercent-negativePercent;
+			double diff = (diffPercent-complaint)/4;
+			System.out.println("Bank name check: " + bankInfoList.get(i).getName() + "---" + sentimentInfoList.get(i).getBankName() + "---" + displayBanks[i] + ":" + diff);
+			if (val < diff) {
+				val = diff;
+				index = i;
+			}
+		}
+		String chosen = displayBanks[index];
+		System.out.println("Bank chosen: " + chosen);
+		return chosen;
 	}
 
 	private Database getDB() {
