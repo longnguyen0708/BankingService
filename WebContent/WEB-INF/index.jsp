@@ -31,10 +31,11 @@
 
 	<div id="intro">
 		<div class="row">
-			<div class="col-sm-10">
-				<p class="description"></p>
+			<div class="col-sm-1">
+				<img src="/resources/images/logo.png" alt="logo" style=" width: 100px;height:100px;float:left">
+
 			</div>
-			<div class="col-sm-2" style="float: right;">
+			<div class="col-sm-11">
 				<%
 					UserInfo userData = (UserInfo) request.getSession().getAttribute(
 							"LOGGEDIN_USER");
@@ -42,7 +43,7 @@
 				%>
 
 				<input type="button" value="Sign in" data-toggle="modal"
-					data-target="#myModalin">
+					data-target="#myModalin" style="float:right; color: blue">
 
 				<%
 					} else {
@@ -55,11 +56,12 @@
 				<%
 					}
 				%>
-			</div>
-		</div>
+			
+		
 		<h1>Retail Banking Services Recommendation</h1>
+</div>
+	</div></div>
 
-	</div>
 
 
 
@@ -131,6 +133,7 @@
 				<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
 				<li data-target="#myCarousel" data-slide-to="1"></li>
 				<li data-target="#myCarousel" data-slide-to="2"></li>
+				<li data-target="#myCarousel" data-slide-to="3"></li>
 				<br>
 			</ol>
 
@@ -148,6 +151,10 @@
 
 				<div class="item">
 					<img src="/resources/images/Pic3.png" alt="Bank3" width="460"
+						height="100">
+				</div>
+				<div class="item">
+					<img src="/resources/images/Pic4.png" alt="Bank4" width="460"
 						height="100">
 				</div>
 
