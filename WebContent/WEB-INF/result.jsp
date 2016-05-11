@@ -44,6 +44,8 @@ div#sel {
 	var placeservice;
 	var markers = [];
 	var map;
+	var directionsDisplay = null;
+	var directionsService;
 
 	function initMap() {
 		map = new google.maps.Map(document.getElementById('map'), {
@@ -53,12 +55,17 @@ div#sel {
 				lng : -121.881
 			}
 		});
+		directionsService = new google.maps.DirectionsService;
 		var geocoder = new google.maps.Geocoder;
 		var infowindow = new google.maps.InfoWindow;
 		infowindowtarget = new google.maps.InfoWindow();
 		placeservice = new google.maps.places.PlacesService(map);
 
 		map.addListener('click', function(e) {
+			if (directionsDisplay != null) {
+				directionsDisplay.setMap(null);
+				directionsDisplay = null;
+			}
 			geocodeLatLng(e.latLng, geocoder, infowindow);
 		});
 
@@ -112,11 +119,13 @@ div#sel {
 										}
 										marker = new google.maps.Marker({
 											position : latlng,
+											icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
 											map : map
 										});
 
 										infowindow
-												.setContent(results[0].formatted_address);
+												.setContent(results[0].formatted_address
+														+ "<br>Our Recommendation: <b>Wells Fargo</b><br>Click on the marker to see the nearest bank.");
 										infowindow.open(map, marker);
 
 										//clear target markers
@@ -129,6 +138,7 @@ div#sel {
 												.addListener(
 														'click',
 														function() {
+															infowindow.close();
 															placeservice
 																	.nearbySearch(
 																			{
@@ -159,22 +169,52 @@ div#sel {
 				max = 3;
 			}
 			for (var i = 0; i < max; i++) {
-				createMarker(results[i]);
+				createMarker(results[i], i * 300);
 			}
 		}
 	}
 
-	function createMarker(place) {
-		var bankmarker = new google.maps.Marker({
-			map : map,
-			position : place.geometry.location
-		});
+	function createMarker(place, timeout) {
+		window.setTimeout(function() {
+			var bankmarker = new google.maps.Marker({
+				map : map,
+				animation : google.maps.Animation.DROP,
+				position : place.geometry.location
+			});
 
-		markers.push(bankmarker);
+			markers.push(bankmarker);
 
-		google.maps.event.addListener(bankmarker, 'click', function() {
-			infowindowtarget.setContent(place.name);
-			infowindowtarget.open(map, this);
+			google.maps.event.addListener(bankmarker, 'click', function() {
+				infowindowtarget.setContent(place.name);
+				infowindowtarget.open(map, this);
+				calculateAndDisplayRoute(this);
+			});
+		}, timeout);
+	}
+
+	function calculateAndDisplayRoute(bankmarker) {
+		directionsService.route({
+			origin : marker.getPosition(),
+			destination : bankmarker.getPosition(),
+			travelMode : google.maps.TravelMode.DRIVING
+		}, function(response, status) {
+			if (status === google.maps.DirectionsStatus.OK) {
+				if (directionsDisplay != null) {
+					directionsDisplay.setMap(null);
+					directionsDisplay = null;
+				}
+				directionsDisplay = new google.maps.DirectionsRenderer;
+				directionsDisplay.setMap(map);
+				document.getElementById('graph_content').innerHTML = "";
+				directionsDisplay.setPanel(document
+						.getElementById('graph_content'));
+				directionsDisplay.setOptions({
+					suppressMarkers : true
+				});
+				directionsDisplay.setDirections(response);
+			} else {
+				window.alert('Directions request failed due to ' + status);
+			}
 		});
 	}
 
