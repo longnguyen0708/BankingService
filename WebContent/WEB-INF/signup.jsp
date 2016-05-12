@@ -29,7 +29,7 @@
 	<div id="login" class="container">
 
 		<div class="row">
-			<div class="col-sm-6">
+			<!--div class="col-sm-7"-->
 				<div class="login-container">
 					<div id="output"></div>
 					<div class="avatar"></div>
@@ -55,7 +55,7 @@
 						</form:form>
 					</div>
 				</div>
-			</div>
+			<!-- /div-->
 		</div>
 	</div>
 
